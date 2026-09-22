@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ADAM — Advanced Dining Analysis & Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #15130F;
+  --panel: #1E1A15;
+  --panel-2: #262019;
+  --gold: #C79A44;
+  --gold-bright: #E3BC6C;
+  --gold-dim: rgba(199,154,68,0.15);
+  --cream: #EFE6D3;
+  --steel: #948A78;
+  --line: rgba(199,154,68,0.18);
+  --line-soft: rgba(239,230,211,0.07);
+  --max: 1080px;
+  --max-text: 680px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  font-family:'Public Sans',Arial,sans-serif;
+  background:var(--ink);
+  color:var(--cream);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.65;
+  padding-top:env(safe-area-inset-top,0);
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:600;line-height:1.18;color:#fff;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 32px;}
+section{scroll-margin-top:72px;}
+
+/* ---- NAV ---- */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(21,19,15,0.93);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line-soft);
+  padding-top:env(safe-area-inset-top,0);
+}
+.nav-inner{
+  max-width:var(--max);margin:0 auto;padding:0 32px;
+  height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.nav-brand{display:flex;flex-direction:column;gap:1px;}
+.nav-brand .name{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--gold);letter-spacing:-0.01em;}
+.nav-brand .sub{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{font-size:13.5px;color:var(--steel);transition:color .15s;}
+.nav-links a:hover{color:var(--cream);}
+.nav-cta{
+  font-size:13px;font-weight:600;
+  background:var(--gold);color:#1A1408;
+  padding:9px 18px;border-radius:2px;
+  transition:background .15s;white-space:nowrap;
+}
+.nav-cta:hover{background:var(--gold-bright);color:#1A1408;}
+.nav-mobile{display:none;background:none;border:none;cursor:pointer;padding:4px;}
+.nav-mobile svg{display:block;}
+
+/* ---- HERO ---- */
+.hero{padding:100px 0 88px;}
+.hero-inner{max-width:var(--max);margin:0 auto;padding:0 32px;}
+.hero-kicker{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:28px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-kicker::before{content:'';display:block;width:24px;height:1px;background:var(--gold);}
+.hero h1{
+  font-size:clamp(38px,5.5vw,68px);
+  font-weight:600;max-width:15ch;
+  margin-bottom:28px;
+  color:#fff;
+  letter-spacing:-0.02em;
+}
+.hero-sub{
+  font-size:clamp(16px,1.8vw,19px);
+  color:var(--steel);
+  max-width:54ch;
+  line-height:1.7;
+  margin-bottom:44px;
+  font-weight:400;
+}
+.hero-sub strong{color:var(--cream);font-weight:500;}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.btn-primary{
+  background:var(--gold);color:#1A1408;
+  font-size:14.5px;font-weight:700;
+  padding:14px 26px;border-radius:2px;
+  transition:background .15s;
+  display:inline-block;
+}
+.btn-primary:hover{background:var(--gold-bright);}
+.btn-ghost{
+  font-size:14px;font-weight:500;color:var(--cream);
+  border:1px solid var(--line);
+  padding:13px 22px;border-radius:2px;
+  transition:border-color .15s,color .15s;
+  display:inline-block;
+}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-bright);}
+
+/* ---- STATS ---- */
+.stats{
+  border-top:1px solid var(--line-soft);
+  border-bottom:1px solid var(--line-soft);
+  padding:36px 0;
+  background:var(--panel);
+}
+.stats-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;
+}
+.stat{
+  padding:0 32px;
+  border-right:1px solid var(--line-soft);
+  text-align:center;
+}
+.stat:first-child{border-left:none;padding-left:0;text-align:left;}
+.stat:last-child{border-right:none;}
+.stat-num{
+  display:block;
+  font-family:'Fraunces',serif;
+  font-size:clamp(28px,3vw,40px);
+  font-weight:600;color:var(--gold);
+  line-height:1;margin-bottom:6px;
+}
+.stat-label{font-size:12.5px;color:var(--steel);font-weight:400;}
+
+/* ---- SECTIONS ---- */
+.section{padding:88px 0;}
+.section-alt{background:var(--panel);border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);}
+.section-kicker{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.section h2{
+  font-size:clamp(26px,3.5vw,40px);
+  margin-bottom:20px;letter-spacing:-0.015em;
+}
+.section-lede{
+  font-size:clamp(15px,1.6vw,17.5px);
+  color:var(--steel);max-width:58ch;line-height:1.75;
+  margin-bottom:16px;
+}
+.section-lede strong{color:var(--cream);font-weight:500;}
+.prose{color:var(--cream);font-size:16px;line-height:1.8;max-width:60ch;margin-bottom:16px;}
+.prose:last-child{margin-bottom:0;}
+
+/* ---- PROBLEM SECTION ---- */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;margin-top:48px;}
+.problem-col h3{font-size:19px;margin-bottom:12px;color:#fff;}
+.problem-col p{font-size:15px;color:var(--steel);line-height:1.8;}
+
+/* ---- FEATURES ---- */
+.feature-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px;}
+.tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px;
+  border:1px solid var(--line);
+  padding:7px 14px;border-radius:2px;
+  color:var(--steel);
+  transition:border-color .15s,color .15s;
+}
+.tag:hover{border-color:var(--gold);color:var(--gold-bright);}
+.tag.highlight{border-color:var(--gold);color:var(--gold);}
+
+/* ---- QUOTE ---- */
+.pull-quote{
+  border-left:3px solid var(--gold);
+  padding:24px 28px;
+  margin:40px 0;
+  background:var(--panel-2);
+  max-width:65ch;
+}
+.pull-quote p{
+  font-family:'Fraunces',serif;
+  font-size:clamp(16px,1.8vw,20px);
+  font-style:italic;
+  font-weight:400;
+  color:#fff;
+  line-height:1.65;
+  margin-bottom:14px;
+}
+.pull-quote cite{
+  font-size:12.5px;font-style:normal;
+  color:var(--steel);
+  font-family:'IBM Plex Mono',monospace;
+}
+
+/* ---- FOUNDERS CIRCLE ---- */
+.fc-benefits{margin-top:36px;display:flex;flex-direction:column;gap:12px;}
+.fc-benefit{display:flex;gap:14px;align-items:flex-start;}
+.fc-benefit-mark{
+  width:20px;height:20px;flex-shrink:0;margin-top:2px;
+  border:1px solid var(--gold);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.fc-benefit-mark svg{display:block;}
+.fc-benefit-text{font-size:15.5px;color:var(--cream);line-height:1.6;}
+
+/* ---- PRICING ---- */
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px;}
+.price-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:36px 32px;
+}
+.price-card.featured{
+  border-color:var(--gold);
+  background:var(--panel-2);
+  position:relative;
+}
+.price-card.featured::before{
+  content:'Most Popular';
+  position:absolute;top:-1px;right:24px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
+  background:var(--gold);color:#1A1408;
+  padding:4px 12px;font-weight:600;
+}
+.price-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--steel);margin-bottom:12px;
+}
+.price-card h3{font-size:22px;margin-bottom:6px;}
+.price-amount{
+  font-family:'Fraunces',serif;
+  font-size:44px;font-weight:600;
+  color:var(--gold);line-height:1;
+  margin-bottom:4px;
+}
+.price-amount span{font-size:18px;color:var(--steel);font-family:'Public Sans',sans-serif;font-weight:400;}
+.price-sub{font-size:13px;color:var(--steel);margin-bottom:28px;line-height:1.5;}
+.price-divider{height:1px;background:var(--line);margin-bottom:24px;}
+.price-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
+.price-list li{
+  font-size:14px;color:var(--cream);
+  padding-left:20px;position:relative;line-height:1.55;
+}
+.price-list li::before{
+  content:'';position:absolute;left:0;top:7px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--gold);opacity:0.7;
+}
+.price-cta{
+  display:block;width:100%;
+  background:var(--gold);color:#1A1408;
+  font-size:14.5px;font-weight:700;
+  padding:14px 20px;text-align:center;
+  border-radius:2px;transition:background .15s;
+  border:none;cursor:pointer;
+}
+.price-cta:hover{background:var(--gold-bright);}
+.price-cta-ghost{
+  display:block;width:100%;
+  background:transparent;color:var(--cream);
+  font-size:14.5px;font-weight:600;
+  padding:13px 20px;text-align:center;
+  border-radius:2px;
+  border:1px solid var(--line);
+  transition:border-color .15s,color .15s;
+  cursor:pointer;
+}
+.price-cta-ghost:hover{border-color:var(--gold);color:var(--gold-bright);}
+.price-note{font-size:12px;color:var(--steel);text-align:center;margin-top:10px;}
+.pricing-caveat{
+  margin-top:28px;
+  padding:18px 22px;
+  border:1px solid var(--line-soft);
+  font-size:13.5px;color:var(--steel);
+  line-height:1.7;
+  max-width:680px;
+}
+.pricing-caveat strong{color:var(--cream);}
+
+/* ---- APPLICATION ---- */
+.form-wrap{max-width:640px;margin-top:44px;}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:22px;}
+.field label{font-size:13px;font-weight:600;color:var(--cream);}
+.field .hint{font-size:12px;color:var(--steel);}
+.field input,.field select,.field textarea{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:2px;
+  padding:12px 14px;
+  color:#fff;
+  font-family:'Public Sans',sans-serif;
+  font-size:15px;
+  transition:border-color .15s;
+  width:100%;
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--steel);}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--gold);
+}
+.field select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23948A78' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;cursor:pointer;
+}
+.field select option{background:var(--panel);color:#fff;}
+.field textarea{resize:vertical;min-height:100px;line-height:1.6;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.submit-btn{
+  background:var(--gold);color:#1A1408;
+  font-family:'Public Sans',sans-serif;
+  font-size:15px;font-weight:700;
+  padding:15px 28px;border-radius:2px;
+  border:none;cursor:pointer;
+  transition:background .15s;width:100%;
+  margin-top:8px;
+}
+.submit-btn:hover{background:var(--gold-bright);}
+.form-status{
+  margin-top:16px;font-size:14px;
+  color:var(--gold-bright);min-height:20px;
+  display:none;
+}
+.form-status.show{display:block;}
+
+/* ---- FOOTER ---- */
+footer{
+  padding:56px 0 36px;
+  border-top:1px solid var(--line-soft);
+  background:var(--panel);
+}
+.footer-inner{
+  display:flex;justify-content:space-between;
+  align-items:flex-start;gap:32px;flex-wrap:wrap;
+}
+.footer-brand .name{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--gold);}
+.footer-brand .sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;}
+.footer-brand p{font-size:13px;color:var(--steel);margin-top:12px;max-width:28ch;line-height:1.6;}
+.footer-links{display:flex;flex-direction:column;gap:10px;}
+.footer-links a{font-size:13.5px;color:var(--steel);transition:color .15s;}
+.footer-links a:hover{color:var(--gold-bright);}
+.footer-bottom{
+  margin-top:44px;padding-top:22px;
+  border-top:1px solid var(--line-soft);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  font-size:12px;color:var(--steel);
+}
+
+/* ---- RESPONSIVE ---- */
+@media(max-width:860px){
+  .pricing-grid{grid-template-columns:1fr;}
+  .problem-grid{grid-template-columns:1fr;gap:36px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);row-gap:28px;}
+  .stat:nth-child(3){border-left:none;}
+  .stat:nth-child(2){border-right:none;}
+}
+@media(max-width:720px){
+  .nav-links{display:none;}
+  .nav-cta{display:none;}
+  .nav-mobile{display:flex;align-items:center;justify-content:center;}
+  .hero{padding:64px 0 56px;}
+  .section{padding:64px 0;}
+  .form-row{grid-template-columns:1fr;}
+  .footer-inner{flex-direction:column;gap:28px;}
+}
+@media(max-width:480px){
+  .wrap{padding:0 20px;}
+  .nav-inner{padding:0 20px;}
+  .hero-inner{padding:0 20px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .stat:first-child{text-align:center;padding-left:32px;}
+  .pull-quote{padding:18px 20px;}
+  .price-card{padding:28px 22px;}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="name">ADAM</span>
+      <span class="sub">Advanced Dining Analysis & Management</span>
+    </div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#founders-circle">Founders Circle</a>
+      <a href="#apply">Apply</a>
+    </div>
+    <a href="#apply" class="nav-cta">Apply to Join</a>
+    <button class="nav-mobile" aria-label="Menu" onclick="document.querySelector('.nav-links').style.display=document.querySelector('.nav-links').style.display==='flex'?'none':'flex'">
+      <svg width="22" height="16" viewBox="0 0 22 16" fill="none"><rect y="0" width="22" height="1.8" rx="0.9" fill="#EFE6D3"/><rect y="7" width="22" height="1.8" rx="0.9" fill="#EFE6D3"/><rect y="14" width="22" height="1.8" rx="0.9" fill="#EFE6D3"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-kicker">Founders Circle — Limited to 15 Members</div>
+    <h1>Independent restaurants deserve the same intelligence chains have.<br>Help us build it.</h1>
+    <p class="hero-sub">ADAM is being built by someone who spent <strong>39 years operating restaurants at every level.</strong> The Founders Circle is a small group of serious operators who will shape what it becomes — and lock in founding pricing forever.</p>
+    <div class="hero-ctas">
+      <a href="#apply" class="btn-primary">Apply to Join the Founders Circle</a>
+      <a href="#about" class="btn-ghost">Learn More</a>
+    </div>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="wrap stats-grid">
+    <div class="stat">
+      <span class="stat-num">39</span>
+      <span class="stat-label">Years in hospitality</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">14</span>
+      <span class="stat-label">Restaurants operated</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">$20M+</span>
+      <span class="stat-label">P&L managed</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">15</span>
+      <span class="stat-label">Founding members available</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section" id="about">
+  <div class="wrap">
+    <div class="section-kicker">Why ADAM Exists</div>
+    <h2>Chains have systems.<br>Independent operators have instinct.</h2>
+    <p class="section-lede">The restaurant across the street with 200 locations has a dedicated COO, an operations intelligence platform, compliance systems, and an advisory team. You have experience, hustle, and a gut feeling.</p>
+    <p class="section-lede">ADAM exists to close that gap — not with enterprise software at enterprise prices, but with a platform built by someone who has been on your side of the pass-through window for nearly four decades.</p>
+    <div class="problem-grid">
+      <div class="problem-col">
+        <h3>What chains have</h3>
+        <p>Real-time operational audits. AI-assisted advisory. Compliance tracking. Multi-location dashboards. A COO who reads the data every Monday and tells the team what to fix first.</p>
+      </div>
+      <div class="problem-col">
+        <h3>What independents have</h3>
+        <p>Experience. Instinct. A spreadsheet. And the same operational complexity as a chain — with none of the infrastructure to manage it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT ADAM IS -->
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-kicker">The Platform</div>
+    <h2>An advisor.<br>Not another app.</h2>
+    <p class="section-lede"><strong>ADAM — Advanced Dining Analysis & Management</strong> is a multi-mode restaurant intelligence platform. Audit your operation the way a seasoned COO would. Get findings connected directly to what they're costing you. Receive AI-powered advisory that tells you not just what's wrong, but what to fix first.</p>
+    <p class="section-lede">Built for the operator running one restaurant or five. Not for chains. Not for investors. For you.</p>
+    <div class="feature-tags">
+      <span class="tag highlight">Owner Mode</span>
+      <span class="tag highlight">AI Advisory Board</span>
+      <span class="tag">Secret Shopper Mode</span>
+      <span class="tag">GM / District Manager Mode</span>
+      <span class="tag">Health & Safety Mode</span>
+      <span class="tag">Mobile Field Capture</span>
+      <span class="tag">Voice-to-Text Notes</span>
+      <span class="tag">Photo Evidence</span>
+      <span class="tag">Offline Mode</span>
+      <span class="tag">GPS Timestamp</span>
+      <span class="tag">Prioritized Action Plans</span>
+      <span class="tag">Executive Reports</span>
+      <span class="tag">Multi-Location Dashboard</span>
+      <span class="tag">Corrective Action Tracking</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER -->
+<section class="section" id="founder">
+  <div class="wrap">
+    <div class="section-kicker">Built By</div>
+    <h2>39 years in the room.</h2>
+    <p class="prose">Victor "Manny" Martinez Lopez spent 39 years in hospitality — on the floor, in the kitchen, and in the back office managing a $20M+ P&L across 14 restaurants. He knows what it looks like when a dining room is actually working. And he knows what it costs when the small things — the invisible gaps between what your team says is happening and what's actually happening — go unchecked.</p>
+    <p class="prose">ADAM is the tool he wished existed every year he spent in those rooms.</p>
+    <div class="pull-quote">
+      <p>"In hospitality, the best operators I ever worked alongside all had something in common — they had a trusted advisor in their corner. Someone who knew the numbers, walked the floor, read the room, and told them the truth. Most independent restaurant owners have never had that person. ADAM is that advisor — built from 39 years of being in those rooms myself. Advanced Dining Analysis &amp; Management. But honestly? It's named for what it does for you — it's the advisor you never had access to before."</p>
+      <cite>— Victor "Manny" Martinez Lopez, Founder &amp; Chairman, Martinez Hospitality Group LLC</cite>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDERS CIRCLE -->
+<section class="section section-alt" id="founders-circle">
+  <div class="wrap">
+    <div class="section-kicker">Why Join Now</div>
+    <h2>This isn't a pre-sale.<br>It's an invitation to build.</h2>
+    <p class="section-lede">The Founders Circle is a small, curated group of serious restaurant operators who will shape ADAM from the ground up. You'll have direct access to Manny during the build, a seat at every major product decision, and your name in the product when it launches publicly.</p>
+    <p class="section-lede">Your founding pricing is your permanent reward for being part of building it. <strong>Limited to 15 founding members.</strong></p>
+    <div class="fc-benefits">
+      <div class="fc-benefit">
+        <div class="fc-benefit-mark"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#C79A44" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="fc-benefit-text">Direct access to Manny during the entire build — not a support ticket, a real conversation</span>
+      </div>
+      <div class="fc-benefit">
+        <div class="fc-benefit-mark"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#C79A44" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="fc-benefit-text">Monthly 60-minute Founders Call — your real-world problems shape the product roadmap</span>
+      </div>
+      <div class="fc-benefit">
+        <div class="fc-benefit-mark"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#C79A44" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="fc-benefit-text">Private feedback channel — your input drives decisions before the product ships</span>
+      </div>
+      <div class="fc-benefit">
+        <div class="fc-benefit-mark"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#C79A44" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="fc-benefit-text">Named as a Founding Member when ADAM launches publicly</span>
+      </div>
+      <div class="fc-benefit">
+        <div class="fc-benefit-mark"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#C79A44" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="fc-benefit-text">Founders pricing locked for life — $59/mo regardless of what future pricing becomes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="section-kicker">Join the Founders Circle</div>
+    <h2>Two ways in.<br>One founding rate.</h2>
+    <p class="section-lede">Both tiers give you the same direct access, the same co-creation role, and the same $59/mo rate locked for life. The difference is how much you want to invest in being part of building this.</p>
+    <div class="pricing-grid">
+
+      <div class="price-card">
+        <div class="price-label">Founders Circle</div>
+        <h3>Founder's Deposit</h3>
+        <div class="price-amount">$149<span> one-time</span></div>
+        <p class="price-sub">then $59/mo locked for life at launch</p>
+        <div class="price-divider"></div>
+        <ul class="price-list">
+          <li>$149 applies toward your first month at launch</li>
+          <li>$59/mo locked for life — never increases</li>
+          <li>Direct access to Manny during the build</li>
+          <li>Monthly Founders Call (60 min)</li>
+          <li>Private feedback channel</li>
+          <li>Named as a Founding Member at launch</li>
+          <li>Fully refundable if ADAM does not launch by March 21, 2027</li>
+        </ul>
+        <a href="#apply" class="price-cta-ghost">Apply — Founders Circle</a>
+        <p class="price-note">Application reviewed personally by Manny</p>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-label">Charter Founder</div>
+        <h3>Charter Membership</h3>
+        <div class="price-amount">$299<span> one-time</span></div>
+        <p class="price-sub">then $59/mo locked for life at launch</p>
+        <div class="price-divider"></div>
+        <ul class="price-list">
+          <li>First 3 months free at launch ($177 value)</li>
+          <li>$59/mo locked for life after — never increases</li>
+          <li>Direct access to Manny during the build</li>
+          <li>Monthly Founders Call (60 min)</li>
+          <li>Private feedback channel</li>
+          <li>Permanently named in the product as a Charter Founder</li>
+          <li>Priority onboarding when ADAM launches</li>
+          <li>Fully refundable if ADAM does not launch by March 21, 2027</li>
+        </ul>
+        <a href="#apply" class="price-cta">Apply — Charter Founder</a>
+        <p class="price-note">Application reviewed personally by Manny</p>
+      </div>
+
+    </div>
+    <div class="pricing-caveat">
+      <strong>How it works:</strong> Submit your application below. Manny reviews every application personally. If accepted, you'll receive a secure payment link via email. Payment activates your Founders Circle membership and locks your rate.
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATION -->
+<section class="section section-alt" id="apply">
+  <div class="wrap">
+    <div class="section-kicker">Apply to Join</div>
+    <h2>Tell us about your restaurant.</h2>
+    <p class="section-lede">Every application is read by Manny personally. This isn't a form that feeds an algorithm — it's the start of a conversation. If you're accepted, you'll hear back with next steps.</p>
+    <div class="form-wrap">
+      <form id="adamForm" action="https://formspree.io/f/xdekgzog" method="POST">
+        <div class="form-row">
+          <div class="field">
+            <label for="fname">Your name <span style="color:var(--gold)">*</span></label>
+            <input type="text" id="fname" name="name" placeholder="Your full name" required>
+          </div>
+          <div class="field">
+            <label for="femail">Email address <span style="color:var(--gold)">*</span></label>
+            <input type="email" id="femail" name="email" placeholder="you@yourrestaurant.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="frestaurant">Restaurant name <span style="color:var(--gold)">*</span></label>
+            <input type="text" id="frestaurant" name="restaurant" placeholder="Your restaurant's name" required>
+          </div>
+          <div class="field">
+            <label for="fphone">Phone number</label>
+            <input type="tel" id="fphone" name="phone" placeholder="(optional)">
+          </div>
+        </div>
+        <div class="field">
+          <label for="ftier">Which tier are you applying for? <span style="color:var(--gold)">*</span></label>
+          <select id="ftier" name="tier" required>
+            <option value="" disabled selected>Select a tier</option>
+            <option value="Founders Circle — $149">Founders Circle — $149 deposit</option>
+            <option value="Charter Founder — $299">Charter Founder — $299 one-time</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fabout">Tell me about your restaurant <span style="color:var(--gold)">*</span></label>
+          <span class="hint">Concept, size, how long you've been operating</span>
+          <textarea id="fabout" name="about" placeholder="Give me the picture..." required style="min-height:110px;"></textarea>
+        </div>
+        <div class="field">
+          <label for="fblindspot">What's the biggest operational blind spot you're currently living with? <span style="color:var(--gold)">*</span></label>
+          <span class="hint">The thing that keeps you up at night — or the thing you suspect is costing you that you can't quite see</span>
+          <textarea id="fblindspot" name="blindspot" placeholder="Be honest — that's the whole point..." required style="min-height:110px;"></textarea>
+        </div>
+        <div class="field">
+          <label for="fwhy">Why do you want to be part of building ADAM? <span style="color:var(--gold)">*</span></label>
+          <textarea id="fwhy" name="why" placeholder="This one matters to us..." required style="min-height:90px;"></textarea>
+        </div>
+        <button type="submit" class="submit-btn" data-fs-submit-btn>Submit My Application</button>
+        <div data-fs-success class="form-status show" style="display:none">Application received. Manny reviews every application personally. You'll hear back with next steps.</div><div data-fs-error class="form-status show" style="display:none;color:#e87a7a"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="name">ADAM</div>
+        <div class="sub">Advanced Dining Analysis & Management</div>
+        <p>A Martinez Hospitality Group LLC product.<br>Built in San Diego, CA.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://martinezconsultingco.com">Martinez Consulting Co</a>
+        <a href="mailto:manny@martinezconsultingco.com">manny@martinezconsultingco.com</a>
+        <a href="#apply">Apply to Join</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Martinez Hospitality Group LLC. All rights reserved.</span>
+      <span>Founders deposits fully refundable if ADAM does not launch by March 21, 2027.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('adamForm');
+  var successDiv = form.querySelector('[data-fs-success]');
+  var errorDiv = form.querySelector('[data-fs-error]');
+  var btn = form.querySelector('[data-fs-submit-btn]');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    btn.textContent = 'Submitting...';
+    btn.disabled = true;
+    successDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+
+    var data = new FormData(form);
+    var payload = {};
+    data.forEach(function(v, k) { payload[k] = v; });
+
+    // Formspree
+    try {
+      var res = await fetch('https://formspree.io/f/xdekgzog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        successDiv.style.display = 'block';
+        form.reset();
+        btn.textContent = 'Application Submitted';
+        btn.style.background = 'rgba(199,154,68,0.25)';
+        btn.style.color = 'var(--gold-bright)';
+      } else {
+        errorDiv.textContent = 'Something went wrong. Please email manny@martinezconsultingco.com directly.';
+        errorDiv.style.display = 'block';
+        btn.textContent = 'Submit My Application';
+        btn.disabled = false;
+      }
+    } catch(err) {
+      errorDiv.textContent = 'Could not submit. Please email manny@martinezconsultingco.com directly.';
+      errorDiv.style.display = 'block';
+      btn.textContent = 'Submit My Application';
+      btn.disabled = false;
+    }
+
+    // HubSpot CRM (fire and forget)
+    try {
+      var hsFields = Object.keys(payload).map(function(k) { return { name: k, value: payload[k] }; });
+      fetch('https://api.hsforms.com/submissions/v3/integration/submit/246384964/05d9d0d0-88e3-4ca9-a002-44bc03df5b8c', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: hsFields, context: { pageUri: window.location.href, pageName: 'ADAM Founders Circle' } })
+      });
+    } catch(e) { console.error('HubSpot error:', e); }
+  });
+});
+</script>
+
+</body>
+</html>
